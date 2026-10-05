@@ -38,10 +38,7 @@ func LoadVFS(root string) (*Node, error) {
 	return loadDir(root, filepath.Base(root))
 }
 
-// loadDir рекурсивно читает содержимое директории в память. Порядок
-// обхода директории на диске не гарантирован, поэтому вложенные узлы
-// сортируются по имени: вывод дерева должен быть одинаковым при каждом
-// запуске.
+// loadDir рекурсивно читает содержимое директории в память.
 func loadDir(path, name string) (*Node, error) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
@@ -57,10 +54,24 @@ func loadDir(path, name string) (*Node, error) {
 		node.Children = append(node.Children, child)
 	}
 
-	sort.Slice(node.Children, func(i, j int) bool {
-		return node.Children[i].Name < node.Children[j].Name
-	})
+	node.sortChildren()
 	return node, nil
+}
+
+// sortChildren упорядочивает вложенные узлы по имени. Порядок обхода
+// директории на диске не гарантирован, поэтому без сортировки вывод
+// ls и дерева мог бы отличаться от запуска к запуску.
+func (n *Node) sortChildren() {
+	sort.Slice(n.Children, func(i, j int) bool {
+		return n.Children[i].Name < n.Children[j].Name
+	})
+}
+
+// addChild добавляет узел в каталог, сохраняя сортировку по имени.
+// Изменяется только дерево в памяти, файлы на диске не затрагиваются.
+func (n *Node) addChild(child *Node) {
+	n.Children = append(n.Children, child)
+	n.sortChildren()
 }
 
 // loadEntry загружает один элемент директории: каталог рекурсивно,

@@ -1,12 +1,13 @@
 #!/bin/sh
-# Проверка требования «все операции производятся в памяти»:
-# контрольные суммы файлов VFS до и после работы эмулятора совпадают.
+# Проверка требования «все операции производятся в памяти»: эмулятор
+# выполняет команды, в том числе изменяющие VFS (touch, cp), а затем
+# контрольные суммы файлов на диске сравниваются с исходными.
 set -e
 cd "$(dirname "$0")/.."
 
 before=$(find vfs/deep -type f -exec shasum {} \; | sort)
 
-printf 'vfs-tree\nls\nexit\n' | go run ./src -vfs vfs/deep > /dev/null
+go run ./src -vfs vfs/deep -script examples/stage5.txt < /dev/null > /dev/null
 
 after=$(find vfs/deep -type f -exec shasum {} \; | sort)
 

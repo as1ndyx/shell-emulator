@@ -1,0 +1,28 @@
+ls
+touch new.txt
+ls
+cat new.txt
+touch docs/notes/idea.txt a.txt
+ls docs/notes
+touch readme.md
+cat readme.md
+cp readme.md copy.md
+cat copy.md
+cp readme.md docs
+ls docs
+cat docs/readme.md
+cp etc/config.ini docs/notes/todo.txt
+cat docs/notes/todo.txt
+cd docs
+cp ../etc/config.ini settings.ini
+ls
+cd
+vfs-tree
+touch
+touch nosuchdir/file.txt
+cp
+cp readme.md
+cp docs backup
+cp nosuch.txt copy.txt
+cp readme.md nosuchdir/copy.md
+cp readme.md readme.md

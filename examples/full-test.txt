@@ -15,3 +15,8 @@ ls nosuchdir
 cd readme.md
 cat docs
 uptime extra
+touch new.txt
+cp readme.md docs
+ls docs
+touch nosuchdir/file.txt
+cp docs backup

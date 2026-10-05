@@ -28,6 +28,8 @@ var commands = map[string]handler{
 	"rev":       cmdRev,
 	"uptime":    cmdUptime,
 	"conf-dump": cmdConfDump,
+	"touch":     cmdTouch,
+	"cp":        cmdCp,
 	"vfs-tree":  cmdVfsTree,
 	"exit":      cmdExit,
 }
