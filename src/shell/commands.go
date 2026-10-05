@@ -13,11 +13,11 @@ import (
 var ErrExit = errors.New("выход из эмулятора")
 
 // Execute выполняет разобранную команду и возвращает текст её вывода.
-// Параметры запуска нужны служебной команде conf-dump. Пустой ввод ничего
-// не печатает и ошибкой не считается. Команды ls и cd пока заглушки,
-// настоящая логика появится на этапе 4. Для неизвестной команды
-// возвращается ошибка.
-func Execute(cfg Config, cmd Command) (string, error) {
+// Параметры запуска нужны служебной команде conf-dump, а загруженное
+// дерево VFS — служебной команде vfs-tree. Пустой ввод ничего не печатает
+// и ошибкой не считается. Команды ls и cd пока заглушки, настоящая логика
+// появится на этапе 4. Для неизвестной команды возвращается ошибка.
+func Execute(cfg Config, vfs *Node, cmd Command) (string, error) {
 	switch cmd.Name {
 	case "":
 		return "", nil
@@ -25,6 +25,8 @@ func Execute(cfg Config, cmd Command) (string, error) {
 		return stub(cmd), nil
 	case "conf-dump":
 		return confDump(cfg, cmd)
+	case "vfs-tree":
+		return vfsTree(vfs, cmd)
 	case "exit":
 		return exit(cmd)
 	default:
@@ -53,6 +55,18 @@ func confDump(cfg Config, cmd Command) (string, error) {
 		lines = append(lines, pair.Key+" = "+pair.Value)
 	}
 	return strings.Join(lines, "\n"), nil
+}
+
+// vfsTree — служебная команда: печатает дерево загруженной в память VFS.
+// Сама VFS при этом не изменяется. Аргументы не поддерживаются.
+func vfsTree(vfs *Node, cmd Command) (string, error) {
+	if len(cmd.Args) > 0 {
+		return "", errors.New("vfs-tree: аргументы не поддерживаются")
+	}
+	if vfs == nil {
+		return "", errors.New("vfs-tree: VFS не загружена, укажите параметр -vfs")
+	}
+	return vfs.Tree(), nil
 }
 
 // exit завершает работу эмулятора. Аргументы не поддерживаются: лишние

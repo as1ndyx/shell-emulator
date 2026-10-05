@@ -11,7 +11,7 @@ func TestRunProcessesSessionAndExits(t *testing.T) {
 	in := strings.NewReader("ls -l\nnope\nexit\nls\n")
 	out := &strings.Builder{}
 
-	if !shell.Run(shell.Config{}, in, out, false) {
+	if !shell.Run(shell.Config{}, nil, in, out, false) {
 		t.Error("команда exit должна завершать цикл")
 	}
 
@@ -30,7 +30,7 @@ func TestRunProcessesSessionAndExits(t *testing.T) {
 func TestRunPrintsPrompt(t *testing.T) {
 	out := &strings.Builder{}
 
-	shell.Run(shell.Config{}, strings.NewReader("exit\n"), out, false)
+	shell.Run(shell.Config{}, nil, strings.NewReader("exit\n"), out, false)
 
 	if !strings.HasPrefix(out.String(), shell.Prompt()) {
 		t.Errorf("приглашение не выведено: %q", out.String())
@@ -41,7 +41,7 @@ func TestRunUsesCustomPrompt(t *testing.T) {
 	cfg := shell.Config{Prompt: "myshell$"}
 	out := &strings.Builder{}
 
-	shell.Run(cfg, strings.NewReader("exit\n"), out, false)
+	shell.Run(cfg, nil, strings.NewReader("exit\n"), out, false)
 
 	if !strings.HasPrefix(out.String(), "myshell$ ") {
 		t.Errorf("приглашение из параметра не использовано: %q", out.String())
@@ -53,7 +53,7 @@ func TestRunUsesCustomPrompt(t *testing.T) {
 func TestRunEchoesInputWhenEnabled(t *testing.T) {
 	out := &strings.Builder{}
 
-	shell.Run(shell.Config{}, strings.NewReader("ls -l\n"), out, true)
+	shell.Run(shell.Config{}, nil, strings.NewReader("ls -l\n"), out, true)
 
 	text := out.String()
 	if !strings.Contains(text, "$ ls -l\n") {
@@ -70,7 +70,7 @@ func TestRunSkipsBadLinesAndContinues(t *testing.T) {
 	in := strings.NewReader("qwerty\nexit extra\nls\n")
 	out := &strings.Builder{}
 
-	if shell.Run(shell.Config{}, in, out, true) {
+	if shell.Run(shell.Config{}, nil, in, out, true) {
 		t.Error("ошибочные строки не должны завершать работу")
 	}
 

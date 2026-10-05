@@ -26,7 +26,7 @@ import (
 // Источник и приёмник передаются аргументами, а не берутся из os напрямую:
 // благодаря этому вместо клавиатуры и экрана можно подставить файл со
 // стартовым скриптом или строку в памяти, что используется в тестах.
-func Run(cfg Config, in io.Reader, out io.Writer, echo bool) bool {
+func Run(cfg Config, vfs *Node, in io.Reader, out io.Writer, echo bool) bool {
 	scanner := bufio.NewScanner(in)
 	for {
 		fmt.Fprint(out, cfg.PromptString())
@@ -41,7 +41,7 @@ func Run(cfg Config, in io.Reader, out io.Writer, echo bool) bool {
 			fmt.Fprintln(out, line)
 		}
 
-		if handle(cfg, line, out) {
+		if handle(cfg, vfs, line, out) {
 			return true
 		}
 	}
@@ -53,8 +53,8 @@ func Run(cfg Config, in io.Reader, out io.Writer, echo bool) bool {
 // продолжается: ошибочные строки скрипта пропускаются, а опечатка
 // не закрывает эмулятор. Пустой вывод не печатается, чтобы пустой ввод
 // не порождал лишних строк.
-func handle(cfg Config, line string, out io.Writer) bool {
-	output, err := Execute(cfg, Parse(line))
+func handle(cfg Config, vfs *Node, line string, out io.Writer) bool {
+	output, err := Execute(cfg, vfs, Parse(line))
 	switch {
 	case errors.Is(err, ErrExit):
 		return true

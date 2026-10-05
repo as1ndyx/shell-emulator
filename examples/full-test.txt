@@ -1,0 +1,11 @@
+conf-dump
+vfs-tree
+ls
+ls -l /home
+cd
+cd /usr/local/bin
+qwerty 1 2
+exit extra
+conf-dump extra
+vfs-tree extra
+ls -a -l --all
