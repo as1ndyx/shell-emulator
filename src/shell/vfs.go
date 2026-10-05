@@ -76,6 +76,43 @@ func loadEntry(path, name string, isDir bool) (*Node, error) {
 	return &Node{Name: name, Data: data}, nil
 }
 
+// child возвращает вложенный узел каталога по имени или nil, если его
+// нет. У файла вложенных узлов не бывает.
+func (n *Node) child(name string) *Node {
+	if !n.IsDir {
+		return nil
+	}
+	for _, child := range n.Children {
+		if child.Name == name {
+			return child
+		}
+	}
+	return nil
+}
+
+// find спускается от узла по списку имён и возвращает найденный узел
+// или nil, если на каком-то шаге нужного имени нет. Пустой список
+// означает сам узел.
+func (n *Node) find(parts []string) *Node {
+	node := n
+	for _, name := range parts {
+		node = node.child(name)
+		if node == nil {
+			return nil
+		}
+	}
+	return node
+}
+
+// displayName возвращает имя для вывода: каталоги помечаются косой
+// чертой в конце, как в ls -F, чтобы их было видно среди файлов.
+func (n *Node) displayName() string {
+	if n.IsDir {
+		return n.Name + "/"
+	}
+	return n.Name
+}
+
 // Tree возвращает дерево узла в виде текста с отступами.
 func (n *Node) Tree() string {
 	var builder strings.Builder
@@ -85,11 +122,7 @@ func (n *Node) Tree() string {
 
 // writeTree рекурсивно печатает узел и его потомков с отступом.
 func (n *Node) writeTree(builder *strings.Builder, indent string) {
-	suffix := ""
-	if n.IsDir {
-		suffix = "/"
-	}
-	fmt.Fprintf(builder, "%s%s%s\n", indent, n.Name, suffix)
+	fmt.Fprintf(builder, "%s%s\n", indent, n.displayName())
 	for _, child := range n.Children {
 		child.writeTree(builder, indent+"  ")
 	}

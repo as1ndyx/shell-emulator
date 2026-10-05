@@ -1,0 +1,31 @@
+ls
+ls docs
+ls readme.md
+cd docs
+ls
+cd notes
+ls
+cat todo.txt
+cat todo.txt draft.txt
+rev todo.txt
+rev todo.txt draft.txt
+cd ..
+cd ../src/app
+ls
+cd /etc
+cat config.ini
+cd ~/docs
+cd
+ls
+uptime
+ls nosuchdir
+ls docs src
+cd nosuchdir
+cd readme.md
+cd docs src
+cat
+cat docs
+cat nosuch.txt
+rev
+rev docs
+uptime extra

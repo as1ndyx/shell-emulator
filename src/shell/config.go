@@ -52,15 +52,6 @@ func (c Config) Pairs() []Pair {
 	}
 }
 
-// PromptString возвращает приглашение к вводу: заданное параметром
-// или собранное из реальных данных ОС, если параметр не указан.
-func (c Config) PromptString() string {
-	if c.Prompt == "" {
-		return Prompt()
-	}
-	return c.Prompt + " "
-}
-
 // valueOrNotSet подставляет пометку вместо пустого значения параметра.
 func valueOrNotSet(value string) string {
 	if value == "" {

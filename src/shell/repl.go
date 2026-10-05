@@ -11,6 +11,8 @@ import (
 // печатает приглашение в out, читает команды из in построчно и выводит
 // результат. Цикл завершается по команде exit или по концу входного
 // потока: пользователь нажал Ctrl+D либо дочитан файл со списком команд.
+// Все команды выполняются в одной сессии s, поэтому, например, каталог,
+// выбранный командой cd, сохраняется для следующих команд.
 // Возвращает true, если была команда exit.
 //
 // Приглашение печатается без перевода строки, чтобы курсор оставался
@@ -26,10 +28,10 @@ import (
 // Источник и приёмник передаются аргументами, а не берутся из os напрямую:
 // благодаря этому вместо клавиатуры и экрана можно подставить файл со
 // стартовым скриптом или строку в памяти, что используется в тестах.
-func Run(cfg Config, vfs *Node, in io.Reader, out io.Writer, echo bool) bool {
+func Run(s *Session, in io.Reader, out io.Writer, echo bool) bool {
 	scanner := bufio.NewScanner(in)
 	for {
-		fmt.Fprint(out, cfg.PromptString())
+		fmt.Fprint(out, s.PromptString())
 
 		if !scanner.Scan() {
 			fmt.Fprintln(out)
@@ -41,7 +43,7 @@ func Run(cfg Config, vfs *Node, in io.Reader, out io.Writer, echo bool) bool {
 			fmt.Fprintln(out, line)
 		}
 
-		if handle(cfg, vfs, line, out) {
+		if handle(s, line, out) {
 			return true
 		}
 	}
@@ -53,8 +55,8 @@ func Run(cfg Config, vfs *Node, in io.Reader, out io.Writer, echo bool) bool {
 // продолжается: ошибочные строки скрипта пропускаются, а опечатка
 // не закрывает эмулятор. Пустой вывод не печатается, чтобы пустой ввод
 // не порождал лишних строк.
-func handle(cfg Config, vfs *Node, line string, out io.Writer) bool {
-	output, err := Execute(cfg, vfs, Parse(line))
+func handle(s *Session, line string, out io.Writer) bool {
+	output, err := s.Execute(Parse(line))
 	switch {
 	case errors.Is(err, ErrExit):
 		return true

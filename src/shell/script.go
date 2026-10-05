@@ -7,8 +7,10 @@ import (
 )
 
 // Start запускает эмулятор: печатает отладочный список параметров,
-// загружает VFS, выполняет стартовый скрипт, если он задан, и переходит
-// в интерактивный режим. Если в скрипте встретилась команда exit,
+// загружает VFS, создаёт сессию, выполняет стартовый скрипт, если он
+// задан, и переходит в интерактивный режим. Сессия одна на всё время
+// работы, поэтому скрипт и интерактивный режим видят один и тот же
+// текущий каталог. Если в скрипте встретилась команда exit,
 // в интерактивный режим эмулятор не переходит. Ошибка возвращается, если
 // не удалось загрузить VFS или открыть стартовый скрипт — ошибки самих
 // команд обрабатываются внутри цикла и работу не прерывают.
@@ -19,9 +21,10 @@ func Start(cfg Config, in io.Reader, out io.Writer) error {
 	if err != nil {
 		return err
 	}
+	session := NewSession(cfg, vfs)
 
 	if cfg.ScriptPath != "" {
-		done, err := runScript(cfg, vfs, out)
+		done, err := runScript(session, out)
 		if err != nil {
 			return err
 		}
@@ -30,7 +33,7 @@ func Start(cfg Config, in io.Reader, out io.Writer) error {
 		}
 	}
 
-	Run(cfg, vfs, in, out, false)
+	Run(session, in, out, false)
 	return nil
 }
 
@@ -53,13 +56,13 @@ func loadVFSIfSet(cfg Config, out io.Writer) (*Node, error) {
 // а ошибочные строки пропускаются с сообщением. Эхо включено: без него
 // на экране был бы виден только вывод, без самого диалога.
 // Возвращает true, если скрипт завершился командой exit.
-func runScript(cfg Config, vfs *Node, out io.Writer) (bool, error) {
-	file, err := os.Open(cfg.ScriptPath)
+func runScript(s *Session, out io.Writer) (bool, error) {
+	file, err := os.Open(s.Config.ScriptPath)
 	if err != nil {
 		return false, fmt.Errorf("стартовый скрипт не открыт: %w", err)
 	}
 	defer file.Close()
 
-	fmt.Fprintf(out, "[debug] выполняется скрипт %s\n", cfg.ScriptPath)
-	return Run(cfg, vfs, file, out, true), nil
+	fmt.Fprintf(out, "[debug] выполняется скрипт %s\n", s.Config.ScriptPath)
+	return Run(s, file, out, true), nil
 }

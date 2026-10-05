@@ -43,20 +43,6 @@ func TestParseFlagsUnknownParameter(t *testing.T) {
 	}
 }
 
-func TestPromptStringFromConfig(t *testing.T) {
-	cfg := shell.Config{Prompt: "myshell$"}
-
-	if cfg.PromptString() != "myshell$ " {
-		t.Errorf("получили %q, ожидали \"myshell$ \"", cfg.PromptString())
-	}
-}
-
-func TestPromptStringFallsBackToOS(t *testing.T) {
-	if (shell.Config{}).PromptString() != shell.Prompt() {
-		t.Error("без параметра приглашение должно браться из данных ОС")
-	}
-}
-
 func TestPrintDebugListsAllParameters(t *testing.T) {
 	cfg := shell.Config{VFSPath: "/tmp/vfs", ScriptPath: "s.txt"}
 	out := &strings.Builder{}

@@ -1,6 +1,8 @@
 ls
 qwerty 1 2
-cd ..
+cd nosuchdir
+cat docs
 exit extra
 conf-dump extra
-cd /tmp
+cd docs
+ls

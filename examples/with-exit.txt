@@ -1,4 +1,4 @@
 conf-dump
-ls -l
+ls
 exit
 ls

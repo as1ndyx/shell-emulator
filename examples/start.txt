@@ -1,5 +1,7 @@
 conf-dump
 ls
-ls -l /home
-cd /usr/local/bin
+cd docs
+ls
+cat overview.txt
 cd
+uptime

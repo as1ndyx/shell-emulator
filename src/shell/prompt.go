@@ -12,10 +12,21 @@ const (
 	unknownHost = "localhost"
 )
 
+// homeDir — обозначение корня VFS в приглашении и в путях. Корень
+// играет роль домашнего каталога, который в настоящей оболочке
+// обозначается тильдой.
+const homeDir = "~"
+
 // Prompt возвращает приглашение к вводу вида username@hostname:~$,
 // собранное из реальных данных операционной системы.
 func Prompt() string {
-	return UserName() + "@" + HostName() + ":~$ "
+	return PromptIn(homeDir)
+}
+
+// PromptIn возвращает приглашение для указанного текущего каталога,
+// например username@hostname:~/docs$, как в настоящей оболочке.
+func PromptIn(dir string) string {
+	return UserName() + "@" + HostName() + ":" + dir + "$ "
 }
 
 // UserName возвращает имя текущего пользователя ОС. Имя берётся

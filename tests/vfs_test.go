@@ -66,7 +66,7 @@ func TestVfsTreeCommand(t *testing.T) {
 		t.Fatalf("неожиданная ошибка: %v", err)
 	}
 
-	out, err := shell.Execute(shell.Config{}, vfs, shell.Parse("vfs-tree"))
+	out, err := shell.NewSession(shell.Config{}, vfs).Execute(shell.Parse("vfs-tree"))
 	if err != nil {
 		t.Fatalf("неожиданная ошибка: %v", err)
 	}
@@ -76,7 +76,7 @@ func TestVfsTreeCommand(t *testing.T) {
 }
 
 func TestVfsTreeWithoutVFS(t *testing.T) {
-	_, err := shell.Execute(shell.Config{}, nil, shell.Parse("vfs-tree"))
+	_, err := shell.NewSession(shell.Config{}, nil).Execute(shell.Parse("vfs-tree"))
 	if err == nil {
 		t.Error("без загруженной VFS ожидали ошибку")
 	}
@@ -85,7 +85,7 @@ func TestVfsTreeWithoutVFS(t *testing.T) {
 func TestVfsTreeWithArgs(t *testing.T) {
 	vfs, _ := shell.LoadVFS("../vfs/minimal")
 
-	_, err := shell.Execute(shell.Config{}, vfs, shell.Parse("vfs-tree extra"))
+	_, err := shell.NewSession(shell.Config{}, vfs).Execute(shell.Parse("vfs-tree extra"))
 	if err == nil {
 		t.Error("ожидали ошибку об аргументах")
 	}

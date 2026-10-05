@@ -1,11 +1,17 @@
 conf-dump
 vfs-tree
 ls
-ls -l /home
-cd
-cd /usr/local/bin
+cd docs
+ls
+cat overview.txt
+rev overview.txt
+cd ..
+uptime
 qwerty 1 2
 exit extra
 conf-dump extra
 vfs-tree extra
-ls -a -l --all
+ls nosuchdir
+cd readme.md
+cat docs
+uptime extra
