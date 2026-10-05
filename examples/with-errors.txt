@@ -1,0 +1,6 @@
+ls
+qwerty 1 2
+cd ..
+exit extra
+conf-dump extra
+cd /tmp

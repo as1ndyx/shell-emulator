@@ -9,7 +9,7 @@ import (
 )
 
 func TestExecuteStubPrintsArgs(t *testing.T) {
-	out, err := shell.Execute(shell.Parse("ls -a /etc"))
+	out, err := shell.Execute(shell.Config{}, shell.Parse("ls -a /etc"))
 	if err != nil {
 		t.Fatalf("неожиданная ошибка: %v", err)
 	}
@@ -19,7 +19,7 @@ func TestExecuteStubPrintsArgs(t *testing.T) {
 }
 
 func TestExecuteStubWithoutArgs(t *testing.T) {
-	out, err := shell.Execute(shell.Parse("cd"))
+	out, err := shell.Execute(shell.Config{}, shell.Parse("cd"))
 	if err != nil {
 		t.Fatalf("неожиданная ошибка: %v", err)
 	}
@@ -29,22 +29,43 @@ func TestExecuteStubWithoutArgs(t *testing.T) {
 }
 
 func TestExecuteUnknownCommand(t *testing.T) {
-	_, err := shell.Execute(shell.Parse("qwerty"))
+	_, err := shell.Execute(shell.Config{}, shell.Parse("qwerty"))
 	if err == nil || !strings.Contains(err.Error(), "команда не найдена") {
 		t.Errorf("ожидали ошибку о неизвестной команде, получили %v", err)
 	}
 }
 
 func TestExecuteExit(t *testing.T) {
-	_, err := shell.Execute(shell.Parse("exit"))
+	_, err := shell.Execute(shell.Config{}, shell.Parse("exit"))
 	if !errors.Is(err, shell.ErrExit) {
 		t.Errorf("ожидали ErrExit, получили %v", err)
 	}
 }
 
 func TestExecuteExitWithArgs(t *testing.T) {
-	_, err := shell.Execute(shell.Parse("exit now"))
+	_, err := shell.Execute(shell.Config{}, shell.Parse("exit now"))
 	if err == nil || errors.Is(err, shell.ErrExit) {
 		t.Errorf("ожидали ошибку об аргументах, получили %v", err)
+	}
+}
+
+func TestExecuteConfDump(t *testing.T) {
+	cfg := shell.Config{VFSPath: "/tmp/vfs", Prompt: "sh$", ScriptPath: "s.txt"}
+
+	out, err := shell.Execute(cfg, shell.Parse("conf-dump"))
+	if err != nil {
+		t.Fatalf("неожиданная ошибка: %v", err)
+	}
+
+	want := "vfs = /tmp/vfs\nprompt = sh$\nscript = s.txt"
+	if out != want {
+		t.Errorf("получили %q, ожидали %q", out, want)
+	}
+}
+
+func TestExecuteConfDumpWithArgs(t *testing.T) {
+	_, err := shell.Execute(shell.Config{}, shell.Parse("conf-dump extra"))
+	if err == nil {
+		t.Error("ожидали ошибку об аргументах")
 	}
 }

@@ -1,0 +1,5 @@
+conf-dump
+ls
+ls -l /home
+cd /usr/local/bin
+cd

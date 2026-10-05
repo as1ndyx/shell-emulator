@@ -1,0 +1,4 @@
+conf-dump
+ls -l
+exit
+ls

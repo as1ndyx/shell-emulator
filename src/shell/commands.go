@@ -13,15 +13,18 @@ import (
 var ErrExit = errors.New("выход из эмулятора")
 
 // Execute выполняет разобранную команду и возвращает текст её вывода.
-// Пустой ввод ничего не печатает и ошибкой не считается. Команды ls и cd
-// на этом этапе — заглушки и обрабатываются одинаково; настоящая логика
-// появится на этапе 4. Для неизвестной команды возвращается ошибка.
-func Execute(cmd Command) (string, error) {
+// Параметры запуска нужны служебной команде conf-dump. Пустой ввод ничего
+// не печатает и ошибкой не считается. Команды ls и cd пока заглушки,
+// настоящая логика появится на этапе 4. Для неизвестной команды
+// возвращается ошибка.
+func Execute(cfg Config, cmd Command) (string, error) {
 	switch cmd.Name {
 	case "":
 		return "", nil
 	case "ls", "cd":
 		return stub(cmd), nil
+	case "conf-dump":
+		return confDump(cfg, cmd)
 	case "exit":
 		return exit(cmd)
 	default:
@@ -37,6 +40,19 @@ func stub(cmd Command) string {
 		return cmd.Name + ": аргументов нет"
 	}
 	return cmd.Name + ": " + strings.Join(cmd.Args, " ")
+}
+
+// confDump — служебная команда: печатает параметры эмулятора
+// в формате ключ-значение. Аргументы не поддерживаются.
+func confDump(cfg Config, cmd Command) (string, error) {
+	if len(cmd.Args) > 0 {
+		return "", errors.New("conf-dump: аргументы не поддерживаются")
+	}
+	lines := make([]string, 0, len(cfg.Pairs()))
+	for _, pair := range cfg.Pairs() {
+		lines = append(lines, pair.Key+" = "+pair.Value)
+	}
+	return strings.Join(lines, "\n"), nil
 }
 
 // exit завершает работу эмулятора. Аргументы не поддерживаются: лишние
